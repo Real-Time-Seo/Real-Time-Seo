@@ -1,13 +1,15 @@
-const lighthouse = require('lighthouse');
-const chromeLauncher = require('chrome-launcher');
-const admin = require('firebase-admin');
+import lighthouse from 'lighthouse';
+import * as chromeLauncher from 'chrome-launcher';
+import admin from 'firebase-admin';
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://real-time-seo-default-rtdb.firebaseio.com"
-});
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://real-time-seo-default-rtdb.firebaseio.com"
+  });
+}
 
 const db = admin.database();
 
@@ -33,6 +35,8 @@ async function run() {
       timestamp: Date.now(),
       SECRET_KEY: 'Msdos755@'
     });
+    
+    console.log("Audit completed and data saved to Firebase.");
   } catch (error) {
     console.error("Audit Error:", error);
     await db.ref('reports/' + process.env.AUDIT_ID).set({
