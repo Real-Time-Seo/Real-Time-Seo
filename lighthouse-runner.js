@@ -30,13 +30,16 @@ async function run() {
     await db.ref('reports/' + process.env.AUDIT_ID).set({
       status: 'completed',
       data: report,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      SECRET_KEY: 'Msdos755@'
     });
   } catch (error) {
     console.error("Audit Error:", error);
     await db.ref('reports/' + process.env.AUDIT_ID).set({
       status: 'failed',
-      error: error.message
+      error: error.message,
+      timestamp: Date.now(),
+      SECRET_KEY: 'Msdos755@'
     });
   } finally {
     await chrome.kill();
