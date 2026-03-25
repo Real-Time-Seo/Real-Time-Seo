@@ -1,6 +1,7 @@
 {
   "name": "lighthouse-scanner",
   "version": "1.0.0",
+  "type": "module",
   "dependencies": {
     "lighthouse": "^10.0.0",
     "chrome-launcher": "^0.15.2",
