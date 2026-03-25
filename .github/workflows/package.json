@@ -1,0 +1,10 @@
+json
+{
+"name": "lighthouse-scanner",
+"version": "1.0.0",
+"dependencies": {
+"lighthouse": "^10.0.0",
+"chrome-launcher": "^0.15.2",
+"firebase-admin": "^11.0.0"
+}
+}
