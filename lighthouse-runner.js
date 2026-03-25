@@ -29,14 +29,16 @@ async function run() {
     const runnerResult = await lighthouse(process.env.AUDIT_URL, options);
     const report = runnerResult.lhr;
     
+    const sanitizedReport = JSON.parse(JSON.stringify(report));
+
     await db.ref('reports/' + process.env.AUDIT_ID).set({
       status: 'completed',
-      data: report,
+      data: sanitizedReport,
       timestamp: Date.now(),
       SECRET_KEY: 'Msdos755@'
     });
     
-    console.log("Audit completed and data saved to Firebase.");
+    console.log("Audit completed and data saved successfully.");
   } catch (error) {
     console.error("Audit Error:", error);
     await db.ref('reports/' + process.env.AUDIT_ID).set({
