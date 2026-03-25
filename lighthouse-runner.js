@@ -41,16 +41,17 @@ async function run() {
     const runnerResult = await lighthouse(process.env.AUDIT_URL, options);
     const report = runnerResult.lhr;
     
+    // ডাটাকে ওয়েবসাইটের ফরম্যাট অনুযায়ী সাজানো
     const cleanData = sanitize(report);
 
     await db.ref('reports/' + process.env.AUDIT_ID).set({
       status: 'completed',
-      data: cleanData,
+      data: { lighthouseResult: cleanData }, // এখানে লজিক ঠিক করা হয়েছে
       timestamp: Date.now(),
       SECRET_KEY: 'Msdos755@'
     });
     
-    console.log("Audit completed and data saved successfully.");
+    console.log("Audit completed and data formatted for website.");
   } catch (error) {
     console.error("Audit Error:", error);
     await db.ref('reports/' + process.env.AUDIT_ID).set({
