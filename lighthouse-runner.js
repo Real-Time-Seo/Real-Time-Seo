@@ -13,6 +13,18 @@ if (!admin.apps.length) {
 
 const db = admin.database();
 
+function sanitize(obj) {
+  if (obj === undefined) return null;
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(sanitize);
+  const out = {};
+  for (const key of Object.keys(obj)) {
+    const newKey = key.replace(/[\.\#\$\/\[\]]/g, '_');
+    out[newKey] = sanitize(obj[key]);
+  }
+  return out;
+}
+
 async function run() {
   const chrome = await chromeLauncher.launch({
     chromeFlags: ['--headless', '--no-sandbox', '--disable-gpu']
@@ -29,11 +41,11 @@ async function run() {
     const runnerResult = await lighthouse(process.env.AUDIT_URL, options);
     const report = runnerResult.lhr;
     
-    const sanitizedReport = JSON.parse(JSON.stringify(report));
+    const cleanData = sanitize(report);
 
     await db.ref('reports/' + process.env.AUDIT_ID).set({
       status: 'completed',
-      data: sanitizedReport,
+      data: cleanData,
       timestamp: Date.now(),
       SECRET_KEY: 'Msdos755@'
     });
