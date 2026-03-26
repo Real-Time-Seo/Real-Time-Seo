@@ -5,9 +5,6 @@ on:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,11 +18,3 @@ jobs:
           AUDIT_ID: ${{ github.event.client_payload.id }}
           AUDIT_MODE: ${{ github.event.client_payload.mode }}
         run: node lighthouse-runner.js
-        
-      - name: Delete Old Runs
-        uses: Mattraks/delete-workflow-runs@v2
-        with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          retain_days: 1
-          keep_minimum_runs: 5
