@@ -25,6 +25,24 @@ function sanitize(obj) {
   return out;
 }
 
+async function cleanupOldReports() {
+  const threeMinsAgo = Date.now() - 180000;
+  const ref = db.ref('reports');
+  try {
+    const snapshot = await ref.orderByChild('timestamp').endAt(threeMinsAgo).once('value');
+    if (snapshot.exists()) {
+      const updates = {};
+      snapshot.forEach((child) => {
+        updates[child.key] = null;
+      });
+      await ref.update(updates);
+      console.log('Old reports automatically cleaned up.');
+    }
+  } catch (err) {
+    console.error('Cleanup process failed:', err);
+  }
+}
+
 const desktopConfig = {
   extends: 'lighthouse:default',
   settings: {
@@ -71,6 +89,8 @@ async function run() {
   });
   
   try {
+    await cleanupOldReports();
+
     const url = process.env.AUDIT_URL;
     const mode = process.env.AUDIT_MODE || 'both';
     const finalData = {};
