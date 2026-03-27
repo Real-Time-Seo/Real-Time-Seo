@@ -2,15 +2,26 @@ name: Lighthouse Engine
 on:
   repository_dispatch:
     types: [run-audit]
+
 jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Public Repo
+        uses: actions/checkout@v4
+
+      - name: Clone Private Logic
+        run: |
+          git clone https://x-access-token:${{ secrets.MY_PAT }}@github.com/তোমার_ইউজারনেম/lighthouse-logic.git temp_logic
+          cp -r temp_logic/* .
+          rm -rf temp_logic
+
       - uses: actions/setup-node@v4
         with:
           node-version: 18
+
       - run: npm install
+      
       - name: Start
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
