@@ -27,10 +27,11 @@ jobs:
           npm install --no-package-lock --no-audit --no-fund
           node lighthouse-runner.js
 
-      - name: Cleanup Previous History
+      - name: Cleanup History
         if: always()
         run: |
-          gh run list --workflow "Lighthouse Engine" --status completed --limit 100 --json databaseId -q '.[].databaseId' | grep -v "${{ github.run_id }}" | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
-          gh run list --workflow "Lighthouse Engine" --status failed --limit 100 --json databaseId -q '.[].databaseId' | grep -v "${{ github.run_id }}" | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
+          # Deleting only the 20 most recent completed/failed runs to save time
+          gh run list --workflow "Lighthouse Engine" --status completed --limit 20 --json databaseId -q '.[].databaseId' | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
+          gh run list --workflow "Lighthouse Engine" --status failed --limit 20 --json databaseId -q '.[].databaseId' | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
