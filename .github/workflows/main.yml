@@ -10,6 +10,8 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,7 +23,7 @@ jobs:
           rm -rf temp_dir
 
       - name: Install
-        run: npm install
+        run: npm install --no-package-lock --no-audit --no-fund
 
       - name: Start Analysis
         env:
@@ -31,7 +33,7 @@ jobs:
       - name: Delete Run History
         if: always()
         run: |
-          curl -L -X DELETE \
-          -H "Authorization: Bearer ${{ secrets.MY_PAT }}" \
-          -H "Accept: application/vnd.github+json" \
-          "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          sleep 2s
+          gh run delete ${{ github.run_id }} --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
