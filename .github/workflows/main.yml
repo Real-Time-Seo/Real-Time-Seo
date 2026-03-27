@@ -3,6 +3,9 @@ on:
   repository_dispatch:
     types: [run-audit]
 
+permissions:
+  actions: write
+
 jobs:
   audit:
     runs-on: ubuntu-latest
@@ -24,8 +27,18 @@ jobs:
       - name: Install
         run: npm install
 
-      - name: Run Batch
+      - name: Run Batch Analysis
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+          # ১০টি ইউআরএল এর লিস্ট এখানে আসবে
           AUDIT_PAYLOAD: ${{ JSON.stringify(github.event.client_payload.batch) }}
         run: node lighthouse-runner.js
+
+      - name: Delete Action Run History
+        if: success()
+        run: |
+          curl -L \
+            -X DELETE \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}
