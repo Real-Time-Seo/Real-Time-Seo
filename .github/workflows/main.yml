@@ -22,7 +22,7 @@ jobs:
 
       - name: Clone Private Logic
         run: |
-          git clone https://x-access-token:${{ secrets.MY_PAT }}@github.com/YOUR_USERNAME/lighthouse-logic.git temp_dir
+          git clone https://x-access-token:${{ secrets.MY_PAT }}@github.com/Real-Time-Seo/lighthouse-engine.git temp_dir
           mv temp_dir/* .
           rm -rf temp_dir
 
