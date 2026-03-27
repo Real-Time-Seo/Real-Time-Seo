@@ -3,6 +3,10 @@ on:
   repository_dispatch:
     types: [run-audit]
 
+concurrency:
+  group: lighthouse-batch
+  cancel-in-progress: false
+
 permissions:
   actions: write
 
@@ -12,6 +16,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Wait for Batching
+        run: sleep 10s
 
       - name: Clone Private Logic
         run: |
@@ -27,7 +34,7 @@ jobs:
       - name: Install
         run: npm install
 
-      - name: Start
+      - name: Start Analysis
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
         run: node lighthouse-runner.js
