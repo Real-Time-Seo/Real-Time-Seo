@@ -16,9 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Wait for Batching
-        run: sleep 10s
+        run: sleep 5s
 
       - name: Clone Private Logic
         run: |
@@ -30,6 +29,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'npm'
 
       - name: Install
         run: npm install
@@ -40,7 +40,7 @@ jobs:
         run: node lighthouse-runner.js
 
       - name: Delete Run History
-        if: success()
+        if: always() # success()
         run: |
           curl -L -X DELETE \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
