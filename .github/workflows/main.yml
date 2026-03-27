@@ -14,24 +14,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Clone Private Logic
+      - name: Clone Private Engine
         run: |
           git clone https://x-access-token:${{ secrets.MY_PAT }}@github.com/Real-Time-Seo/lighthouse-engine.git temp_dir
           mv temp_dir/* .
           rm -rf temp_dir
 
-      - name: Install
-        run: npm install --no-package-lock --no-audit --no-fund
-
       - name: Start Analysis
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
-        run: node lighthouse-runner.js
+          MY_PAT: ${{ secrets.MY_PAT }}
+        run: |
+          npm install --no-package-lock --no-audit --no-fund
+          node lighthouse-runner.js
 
-      - name: Delete Run History
+      - name: Cleanup History
         if: always()
         run: |
-          curl -X DELETE \
-          -H "Authorization: Bearer ${{ secrets.MY_PAT }}" \
-          -H "Accept: application/vnd.github+json" \
-          "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          gh run delete ${{ github.run_id }} --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
