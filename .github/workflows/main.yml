@@ -2,13 +2,9 @@ name: Lighthouse Engine
 on:
   repository_dispatch:
     types: [run-audit]
-
-concurrency:
-  group: lighthouse-batch
-  cancel-in-progress: false
-
 permissions:
   actions: write
+  contents: read
 
 jobs:
   audit:
@@ -16,9 +12,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Wait for Batching
-        run: sleep 5s
 
       - name: Clone Private Logic
         run: |
