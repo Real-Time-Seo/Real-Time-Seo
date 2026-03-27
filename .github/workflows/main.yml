@@ -12,20 +12,20 @@ jobs:
 
       - name: Clone Private Logic
         run: |
-          git clone https://x-access-token:${{ secrets.MY_PAT }}@github.com/তোমার_ইউজারনেম/lighthouse-logic.git temp_logic
-          cp -r temp_logic/* .
-          rm -rf temp_logic
+          git clone https://x-access-token:${{ secrets.MY_PAT }}@github.com/YOUR_GITHUB_USERNAME/lighthouse-logic.git temp_dir
+          mv temp_dir/* .
+          rm -rf temp_dir
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - run: npm install
-      
-      - name: Start
+      - name: Install
+        run: npm install
+
+      - name: Run Batch
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
-          AUDIT_URL: ${{ github.event.client_payload.url }}
-          AUDIT_ID: ${{ github.event.client_payload.id }}
-          AUDIT_MODE: ${{ github.event.client_payload.mode }}
+          AUDIT_PAYLOAD: ${{ JSON.stringify(github.event.client_payload.batch) }}
         run: node lighthouse-runner.js
