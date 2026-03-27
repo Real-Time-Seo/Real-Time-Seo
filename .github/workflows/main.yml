@@ -10,12 +10,12 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Public Repo
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Clone Private Logic
         run: |
-          git clone https://x-access-token:${{ secrets.MY_PAT }}@github.com/YOUR_GITHUB_USERNAME/lighthouse-logic.git temp_dir
+          git clone https://x-access-token:${{ secrets.MY_PAT }}@github.com/YOUR_USERNAME/lighthouse-logic.git temp_dir
           mv temp_dir/* .
           rm -rf temp_dir
 
@@ -27,18 +27,15 @@ jobs:
       - name: Install
         run: npm install
 
-      - name: Run Batch Analysis
+      - name: Start
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
-          # ১০টি ইউআরএল এর লিস্ট এখানে আসবে
-          AUDIT_PAYLOAD: ${{ JSON.stringify(github.event.client_payload.batch) }}
         run: node lighthouse-runner.js
 
-      - name: Delete Action Run History
+      - name: Delete Run History
         if: success()
         run: |
-          curl -L \
-            -X DELETE \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          curl -L -X DELETE \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github+json" \
+          "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
