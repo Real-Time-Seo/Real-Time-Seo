@@ -43,14 +43,10 @@ jobs:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
         run: node lighthouse-runner.js
 
-      - name: Cleanup Old History
+      - name: Cleanup History
         if: always()
+        run: |
+          gh run list --workflow "Lighthouse Engine" --status completed --limit 10 --json databaseId -q '.[].databaseId' | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
+          gh run list --workflow "Lighthouse Engine" --status failed --limit 10 --json databaseId -q '.[].databaseId' | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
-        run: |
-          CURRENT_RUN_ID="${{ github.run_id }}"
-          echo "Keeping current run: $CURRENT_RUN_ID"
-
-          gh run list --workflow "Lighthouse Engine" --status completed --limit 20 --json databaseId -q '.[].databaseId' | grep -v "$CURRENT_RUN_ID" | xargs -I {} gh run delete {} || true
-          
-          gh run list --workflow "Lighthouse Engine" --status failed --limit 20 --json databaseId -q '.[].databaseId' | grep -v "$CURRENT_RUN_ID" | xargs -I {} gh run delete {} || true
