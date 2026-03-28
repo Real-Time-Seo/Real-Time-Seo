@@ -46,7 +46,8 @@ jobs:
       - name: Cleanup History
         if: always()
         run: |
-          gh run list --workflow "Lighthouse Engine" --status completed --limit 10 --json databaseId -q '.[].databaseId' | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
-          gh run list --workflow "Lighthouse Engine" --status failed --limit 10 --json databaseId -q '.[].databaseId' | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
+          sleep 5
+          gh run list --workflow "Lighthouse Engine" --status completed --limit 20 --json databaseId -q '.[].databaseId' | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
+          gh run list --workflow "Lighthouse Engine" --status failure --limit 20 --json databaseId -q '.[].databaseId' | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
