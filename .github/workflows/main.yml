@@ -19,28 +19,16 @@ jobs:
           git clone https://x-access-token:${{ secrets.MY_PAT }}@github.com/Real-Time-Seo/lighthouse-engine.git temp_dir
           mv temp_dir/* .
           rm -rf temp_dir
-      - name: Wait for Batching
-        run: sleep 10s
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Cache Node Modules
-        id: cache-npm
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: npm-cache-${{ hashFiles('package.json') }}
-          restore-keys: |
-            npm-cache-
-
       - name: Install Dependencies
-        if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm install --no-package-lock --no-audit --no-fund
 
-      - name: Start Analysis
+      - name: Start Smart Batch Analysis
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
         run: node lighthouse-runner.js
@@ -48,7 +36,7 @@ jobs:
       - name: Cleanup History
         if: always()
         run: |
-          gh run list --workflow "Lighthouse Engine" --status completed --limit 10 --json databaseId -q '.[].databaseId' | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
-          gh run list --workflow "Lighthouse Engine" --status failed --limit 10 --json databaseId -q '.[].databaseId' | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
+          gh run list --workflow "Lighthouse Engine" --status completed --limit 20 --json databaseId -q '.[].databaseId' | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
+          gh run list --workflow "Lighthouse Engine" --status failed --limit 20 --json databaseId -q '.[].databaseId' | xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
         env:
           GH_TOKEN: ${{ secrets.MY_PAT }}
