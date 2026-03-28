@@ -42,7 +42,6 @@ jobs:
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
         run: node lighthouse-runner.js
-
 	- name: Cleanup History
 	  if: always()
 	  run: |
