@@ -41,6 +41,9 @@ jobs:
       - name: Start Analysis
         env:
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
+          AUDIT_ID: ${{ github.event.client_payload.id }}
+          AUDIT_URL: ${{ github.event.client_payload.url }}
+          AUDIT_MODE: ${{ github.event.client_payload.mode }}
         run: node lighthouse-runner.js
 
       - name: Cleanup History
