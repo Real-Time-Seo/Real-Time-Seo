@@ -49,18 +49,18 @@ jobs:
 
           echo "Audit triggered."
 
-		- name: Cleanup flush history
-		  if: always()
-		  run: |
-			sleep 5
-			CURRENT_RUN=${{ github.run_id }}
-			
-			gh run list --workflow "Batch Flush Timer" --status completed --limit 20 --json databaseId \
-			  -q '.[].databaseId' | grep -v "^${CURRENT_RUN}$" | \
-			  xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
-			  
-			gh run list --workflow "Batch Flush Timer" --status failure --limit 20 --json databaseId \
-			  -q '.[].databaseId' | grep -v "^${CURRENT_RUN}$" | \
-			  xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
-		  env:
-			GH_TOKEN: ${{ secrets.MY_PAT }}
+      - name: Cleanup flush history
+        if: always()
+        run: |
+          sleep 5
+          CURRENT_RUN=${{ github.run_id }}
+
+          gh run list --workflow "Batch Flush Timer" --status completed --limit 20 --json databaseId \
+            -q '.[].databaseId' | grep -v "^${CURRENT_RUN}$" | \
+            xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
+
+          gh run list --workflow "Batch Flush Timer" --status failure --limit 20 --json databaseId \
+            -q '.[].databaseId' | grep -v "^${CURRENT_RUN}$" | \
+            xargs -I {} gh run delete {} --repo ${{ github.repository }} || true
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
